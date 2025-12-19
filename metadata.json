@@ -1,0 +1,5 @@
+{
+  "name": "Copy of Scanner Check",
+  "description": "A scanner verification tool mimicking UrovoScannerService behavior.",
+  "requestFramePermissions": []
+}
