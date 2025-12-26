@@ -1,12 +1,10 @@
 import React from 'react';
 import { ScannerCheckComponent } from './components/ScannerCheckComponent';
 
-const App: React.FC = () => {
+export default function App() {
   return (
     <div className="w-full h-full">
       <ScannerCheckComponent />
     </div>
   );
-};
-
-export default App;
+}

@@ -1,5 +1,5 @@
 {
-  "name": "Copy of Scanner Check",
-  "description": "A scanner verification tool mimicking UrovoScannerService behavior.",
+  "name": "Scanner Check Angular",
+  "description": "A scanner verification tool mimicking UrovoScannerService behavior using Angular.",
   "requestFramePermissions": []
 }

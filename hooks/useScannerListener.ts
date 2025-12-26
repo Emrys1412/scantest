@@ -1,33 +1,51 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
-/**
- * This hook replicates the logic found in UrovoScannerService.
- * specifically the registerScanListener and onEvent methods.
- */
-export const useScannerListener = (
-  onScan: (barcode: string, source: 'clipboard' | 'keyboard') => void
-) => {
+export const useScannerListener = (onScan: (barcode: string) => void) => {
+  // Use a ref for the callback to avoid re-binding listeners on every render if the callback function identity changes
+  const onScanRef = useRef(onScan);
+  onScanRef.current = onScan;
+
   useEffect(() => {
-    // Logic from: private registerScanListener(): void
-    const onEvent = async (event: ClipboardEvent) => {
-      // Logic from: private onEvent
+    const bufferRef = { current: '' };
+    let timeout: any;
+
+    const onPaste = (event: ClipboardEvent) => {
       event.stopPropagation();
-      // NOTE: Using 'any' cast to match snippet behavior where strict types might fight raw DOM events
-      const clipboardData: any = event.clipboardData || (window as any)['clipboardData'];
-      
+      const clipboardData = event.clipboardData || (window as any).clipboardData;
       if (clipboardData) {
-        const text: any = clipboardData.getData('text');
+        const text = clipboardData.getData('text');
         if (text) {
-           onScan(text, 'clipboard');
+          onScanRef.current(text);
         }
       }
     };
 
-    window.addEventListener('paste', onEvent);
-
-    // Logic from: private removeScanListener(): void
-    return () => {
-      window.removeEventListener('paste', onEvent);
+    const onKeyDown = (event: KeyboardEvent) => {
+      // Simulate scanner keyboard wedge input
+      if (event.key === 'Enter') {
+        if (bufferRef.current.length > 0) {
+          onScanRef.current(bufferRef.current);
+          bufferRef.current = '';
+          if (timeout) clearTimeout(timeout);
+        }
+        return;
+      }
+      
+      // Basic character capture (ignoring control keys)
+      if (event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey) {
+        bufferRef.current += event.key;
+        if (timeout) clearTimeout(timeout);
+        // Scanners usually type very fast, reset buffer if too slow
+        timeout = setTimeout(() => { bufferRef.current = ''; }, 100);
+      }
     };
-  }, [onScan]);
+
+    window.addEventListener('paste', onPaste);
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      window.removeEventListener('paste', onPaste);
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, []);
 };
