@@ -92,7 +92,7 @@ export const ScannerCheckComponent: React.FC = () => {
               <div className="w-24 pl-2 flex flex-col justify-start text-right text-gray-600 text-xs leading-relaxed font-mono">
                  <div className="text-gray-800">{formatDate(result.timestamp)}</div>
                  <div className="text-gray-800">{formatTime(result.timestamp)}</div>
-                 <div className="text-[10px] text-gray-400 mt-1">{result.timestamp.getMilliseconds()}</div>
+                 <div className="text-[10px] text-gray-400 mt-1">{result.timestamp.getMilliseconds().toString().padStart(3, '0')}</div>
               </div>
             </div>
           ))
